@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<style type="text/css">
+			#canvas {
+				border: 1px solid #000000;
+				padding-left: 0;
+			    padding-right: 0;
+			    margin-left: auto;
+			    margin-right: auto;
+			    display: block;
+			}
+
+			.texture {
+				display:none;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas" width="1200" height="600"></canvas>
+		<br>
+		<center>
+			<input type="number" id="amount" value="1" min="1" max="100">
+			<button onclick="addObjects();">Rita</button>
+			<button onclick="removeObjects();">Ta bort</button>
+		</center>
+
+		<div>
+			<img src="monster1.png" id="monster1" class="texture">
+			<img src="monster2.png" id="monster2" class="texture">
+			<img src="monster3.png" id="monster3" class="texture">
+		</div>
+		<script type="text/javascript">
+			var c = document.getElementById("canvas");
+			var ctx = c.getContext("2d");
+
+			var sky_color         = "#00AAFF";
+			var grass_color       = "#00FF22";
+			var house_color       = "#FF2222";
+			var windowframe_color = "#FFFFFF";
+			var glass_color       = "#00CCFF";
+			var door_color        = "#440000";
+			var roof_color        = "#FF2222";
+			var outline_color     = "#000000";
+
+			function drawBackground() {
+				// Sky
+				ctx.fillStyle = sky_color;
+				ctx.fillRect(0, 0, 1200, 600);
+
+				// Grass
+				ctx.fillStyle = grass_color;
+				ctx.fillRect(0, 400, 1200, 200);
+			}
+
+			function drawWindow(x, y) {
+				// Window
+				ctx.fillStyle = windowframe_color;
+				ctx.fillRect(x, y, 60, 60);
+				ctx.fillStyle = glass_color;
+				ctx.fillRect(x + 5, y + 5, 50, 50);
+				ctx.fillStyle = windowframe_color;
+				ctx.fillRect(x + 27, y, 6, 60);
+				ctx.fillRect(x, y + 27, 60, 6);
+
+				// Outline
+				ctx.strokeStyle = outline_color;
+				ctx.beginPath();
+				ctx.moveTo(x, y);
+				ctx.lineTo(x, y + 60);
+				ctx.lineTo(x + 60, y + 60);
+				ctx.lineTo(x + 60, y);
+				ctx.closePath();
+				ctx.stroke();
+			}
+
+			function drawHouse() {
+				// House
+				ctx.fillStyle = house_color;
+				ctx.fillRect(450, 260, 300, 160);
+				
+				// Windows
+				drawWindow(470, 290);
+				drawWindow(670, 290);
+
+				// Door
+				ctx.fillStyle = door_color;
+				ctx.fillRect(580, 320, 70, 100);
+
+				// Roof
+				ctx.fillStyle = roof_color;
+				ctx.beginPath();
+				ctx.moveTo(440, 260);
+				ctx.lineTo(600, 180);
+				ctx.lineTo(760, 260);
+				ctx.closePath();
+				ctx.fill();
+
+				// Outline
+				ctx.strokeStyle = outline_color;
+				ctx.beginPath();
+				ctx.moveTo(440, 260);
+				ctx.lineTo(600, 180);
+				ctx.lineTo(760, 260);
+				ctx.lineTo(440, 260);
+				ctx.closePath();
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.moveTo(450, 260);
+				ctx.lineTo(450, 420);
+				ctx.lineTo(750, 420);
+				ctx.lineTo(750, 260);
+				ctx.closePath();
+				ctx.stroke();
+			}
+
+			function drawGrid() {
+				ctx.fillStyle = "#000000";
+				for(let x = 0; x < 1200; x+=10) {
+					ctx.moveTo(x, 0);
+					ctx.lineTo(x, 600);
+					ctx.stroke();
+				}
+
+				for(let y = 0; y < 600; y+=10) {
+					ctx.moveTo(0, y);
+					ctx.lineTo(1200, y);
+					ctx.stroke();
+				}
+			}
+
+			var OBJECT_LIST = [];
+
+			var Object = function(x, y, w, h, texture) {
+				var self = {
+					x:x,
+					y:y,
+					w:w,
+					h:h,
+					texture:texture
+				}
+
+				return self;
+			}
+
+			function drawObjects() {
+				for(let i in OBJECT_LIST) {
+					let obj = OBJECT_LIST[i];
+					let img = document.getElementById(obj.texture);
+					ctx.drawImage(img, obj.x, obj.y, obj.w, obj.h);
+				}
+			}
+
+			function drawAll() {
+				drawBackground();
+				drawHouse();
+				drawObjects();
+			}
+
+			//Get Mouse Position
+			function getMousePos(canvas, evt) {
+			    var rect = canvas.getBoundingClientRect();
+			    return {
+			        x: evt.clientX - rect.left,
+			        y: evt.clientY - rect.top
+			    };
+			}
+
+			function getRandomObject(w, h) {
+				let x = Math.floor(Math.random() * (1200 - w));
+				let y = (450 - h) + Math.floor(Math.random() * (150 + (h / 2)));
+				let texture = "monster" + (Math.floor(Math.random() * 3) + 1);
+
+				return Object(x, y, w, h, texture);
+			}
+
+			function removeObjects() {
+				let amount = document.getElementById("amount").value;
+				for(let i = 0; i < amount; i++) {
+					OBJECT_LIST.pop();
+				}
+				drawAll();
+			}
+
+			function addObjects() {
+				let amount = document.getElementById("amount").value;
+				for(let i = 0; i < amount; i++) {
+					OBJECT_LIST.push(getRandomObject(64,64));
+				}
+				drawAll();
+			}
+
+			window.onload = function() {
+				
+				drawAll();
+			}
+		</script>
+	</body>
+</html>
